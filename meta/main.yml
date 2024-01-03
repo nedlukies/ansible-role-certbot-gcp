@@ -1,16 +1,15 @@
 galaxy_info:
-  role_name: certbot-cloudflare
-  author: Michael Porter
-  description: your description
+  role_name: certbot-gcp
+  author: Ned Lukies
+  description: Certbot using the GCP DNS plugin, based on certbot-gcp
   license: "license (BSD, MIT)"
   min_ansible_version: 2.4
   platforms:
     - name: Ubuntu
       versions:
-        - trusty
-        - xenial
+        - jammy
   galaxy_tags:
-    - cloudflare
+    - gcp
     - networking
     - system
     - web
@@ -20,9 +19,7 @@ galaxy_info:
     - certificates
     - ssl
     - https
-
 dependencies:
     - src: geerlingguy.pip
       version: 1.2.2
     - { role: geerlingguy.certbot, certbot_certs: [], version: 3.0.1 }
-      

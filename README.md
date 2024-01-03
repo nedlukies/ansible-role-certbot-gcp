@@ -1,65 +1,54 @@
-Certbot Cloudfare
+Certbot GCP DNS
 =========
 
-Use Cloudflare DNS for wildcard certbot generation
+Use Google Cloud DNS for wildcard certbot generation
 
 Requirements
 ------------
 
-- Cloudflare DNS setup
-- Cloudflare API Key
-- Wildcard domian setup (for wildcard certs) [*.domain.com or *.subdomain.domain.com]
+- Google Service account with DNS Admin role
 
 Role Variables
 --------------
 
-    certbot_cloudflare_email: "cloudflare@example.com"
-
-Your Cloudflare email address
-
-    certbot_cloudflare_api_key: ''
-
-Your Cloudflare Global API Key, optionally encryped `ansible-vault encrypt_string 'cloudflareAPIKey' --name 'certbot_cloudflare_api_key'`
+    certbot_gcp_credentials: "JSON file with GCP credentials"
 
     certbot_certs:
-      - email: {{certbot_cloudflare_email}}
+      - email: {{certbot_gcp_email}}
         domains:
           - *.example3.com
+    certbot_gcp_acme_server: "{{ certbot_gcp_acme_test }}"
 
-The wildcard domain to create the cert for. For non-wildcard domains I recommend using [geerlingguy.certbot](https://github.com/geerlingguy/ansible-role-certbot)
+OR
 
-    certbot_cloudflare_acme_server: "{{ certbot_cloudflare_acme_test }}"
-
-    or 
-
-    certbot_cloudflare_acme_server: "{{ certbot_cloudflare_acme_live }}"
+    certbot_gcp_acme_server: "{{ certbot_gcp_acme_live }}"
     
 Let's Encrypt server to use, defaults to test.
 
+Example Playbook
+----------------
 
+    - role: geerlingguy.certbot
+      vars:
+        certbot_install_method: package
+        certbot_certs: []
+    - role: ansible-role-certbot-gcp
+      vars:
+        certbot_gcp_credentials: "{{ lookup('file', './zippy-catwalk-330810-d88be8a3abeb.json') }}"
+        certbot_gcp_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
+        certbot_gcp_propagation_seconds: 15
+        certbot_admin_email: 'email@email.com'
+        certbot_certs:
+          - domains: 
+            - '*.example.com'
+            - 'someotherdomain.com'
 Dependencies
 ------------
 
 - geerlingguy.pip
 - geerlingguy.certbot
 
-Example Playbook
-----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-    
-      vars:
-        certbot_cloudflare_email: "cloudflare@example.com"
-        certbot_cloudflare_api_key: 'myapikey'
-        certbot_certs:
-          - email: {{certbot_cloudflare_email}}
-            domains:
-              - *.example3.com
-
-      roles:
-         - michaelpporter.certbot-cloudflare
 
 License
 -------
@@ -69,5 +58,5 @@ MIT / BSD
 Author Information
 ------------------
 
-This role was created in 2018 by [Michael Porter](https://www.michaelpporter.com/).
+This role was created in 2018 by [Michael Porter](https://www.michaelpporter.com/). Adapted for GCP by Ned Lukies
 

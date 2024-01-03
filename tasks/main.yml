@@ -1,26 +1,15 @@
 ---
-# tasks file for certbot-cloudflare
-
-- name: Get software for apt repository management.
-  apt: name={{ item }} state=present
-  with_items:
-    - build-essential
-    - curl
-    - libffi-dev
-    - libssl-dev
-    - python-apt
-    - python-dev
-    - python-pycurl
-
-- name: check if certbot-dns-cloudflare plugin is installed
-  shell: certbot plugins | grep dns-cloudflare
+# tasks file for certbot-gcp
+- name: check if certbot-dns-google plugin is installed
+  shell: "certbot plugins 2>/dev/null|grep dns-google"
   register: cf_check
   ignore_errors: true
   changed_when: "cf_check is failed"
 
-- name: Install certbot-dns-cloudflare
-  shell: "cd {{certbot_dir}}/certbot-dns-cloudflare && python setup.py install"
-  when: cf_check is failed
+- name: Install certbot-dns-google plugin
+  apt:
+    name: python3-certbot-dns-google
+    state: present
 
 - name: Create certbot folder - sudouser
   file:
@@ -32,15 +21,29 @@
 
 - name: Certbot Template
   template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: 'templates/letsencrypt_cli.ini.j2'
+    dest: '/etc/letsencrypt/cli.ini'
     owner: root
     group: root
     mode: 0600
-  with_items:
-    - { src: 'templates/confcloudflare.ini.j2', dest: '/etc/letsencrypt/dnscloudflare.ini' }
-    - { src: 'templates/letsencrypt_cli.ini.j2', dest: '/etc/letsencrypt/cli.ini' }
 
+- name: Create GCP DNS Credentials
+  copy:
+    content: "{{ certbot_gcp_credentials }}"
+    dest: "/etc/letsencrypt/dnsgoogle.json"
+    owner: root
+    group: root
+    mode: 0600
+- name: Dump Vars
+  debug:
+    var: vars
 - name: Create Certs.
   include_role:
     name: geerlingguy.certbot
+  vars:
+    certbot_create_if_missing: true
+    certbot_create_method: "standalone"
+
+
+
+
