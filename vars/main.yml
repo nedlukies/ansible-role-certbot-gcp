@@ -1,5 +1,5 @@
 ---
-certbot_create_command: "certbot certonly --noninteractive --expand --dns-google  --agree-tos --email {{ cert_item.email | default(certbot_admin_email) }} -d {{ cert_item.domains | join(',') }}"
+certbot_create_command: "certbot certonly --noninteractive --dns-google  --agree-tos --email {{ cert_item.email | default(certbot_admin_email) }} -d {{ cert_item.domains | join(',') }}"
 certbot_create_method: standalone
 certbot_install_method: yes
 certbot_repo: https://github.com/certbot/certbot.git
